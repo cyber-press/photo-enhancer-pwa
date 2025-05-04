@@ -31,5 +31,5 @@ No install required — just open the site and click “Add to Home Screen” fo
 
 ---
 
-**Author:** Press  
+**Author:** [Your Name]  
 **GitHub:** [@yourusername](https://github.com/yourusername)

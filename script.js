@@ -143,3 +143,84 @@ function applyBeautifyFilter(type) {
   ctx.drawImage(originalImage, 0, 0);
   ctx.filter = 'none';
 }
+
+
+function applyAutoEnhance() {
+  if (!originalImage) return;
+  blurSlider.value = 4;
+  currentBlur = 4;
+  applySkinSmoothing(currentBlur);
+  applyBeautifyFilter('natural');
+}
+
+
+let isShowingOriginal = false;
+
+function toggleBeforeAfter() {
+  if (!originalImage) return;
+
+  if (!isShowingOriginal) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(originalImage, 0, 0);
+    isShowingOriginal = true;
+    document.querySelector('button[onclick="toggleBeforeAfter()"]').innerText = "Show Enhanced";
+  } else {
+    applySkinSmoothing(currentBlur);
+    isShowingOriginal = false;
+    document.querySelector('button[onclick="toggleBeforeAfter()"]').innerText = "Show Original";
+  }
+}
+
+
+const editHistory = [];
+
+function saveCanvasState() {
+  if (!canvas) return;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  editHistory.push(imageData);
+}
+
+function undoLastEdit() {
+  if (editHistory.length === 0) {
+    alert("No edits to undo.");
+    return;
+  }
+  const lastState = editHistory.pop();
+  ctx.putImageData(lastState, 0, 0);
+}
+
+// Patch key functions to save history before applying edits
+const originalApplySkinSmoothing = applySkinSmoothing;
+applySkinSmoothing = function(blurAmount) {
+  saveCanvasState();
+  originalApplySkinSmoothing(blurAmount);
+};
+
+const originalApplyBeautifyFilter = applyBeautifyFilter;
+applyBeautifyFilter = function(type) {
+  saveCanvasState();
+  originalApplyBeautifyFilter(type);
+};
+
+canvas.addEventListener('click', (e) => {
+  if (!blemishMode || !originalImage) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  saveCanvasState();
+
+  const patchSize = 60;
+  const radius = patchSize / 2;
+
+  const patchCanvas = document.createElement('canvas');
+  patchCanvas.width = patchSize;
+  patchCanvas.height = patchSize;
+  const patchCtx = patchCanvas.getContext('2d');
+
+  patchCtx.drawImage(canvas, x - radius, y - radius, patchSize, patchSize, 0, 0, patchSize, patchSize);
+  patchCtx.filter = 'blur(5px)';
+  patchCtx.drawImage(patchCanvas, 0, 0);
+  ctx.drawImage(patchCanvas, x - radius, y - radius);
+};
