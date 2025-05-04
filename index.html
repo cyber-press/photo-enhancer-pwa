@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Photo Enhancer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <script defer src="https://unpkg.com/face-api.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 20px; text-align: center; }
+    .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+    canvas { width: 100%; border-radius: 10px; margin-top: 15px; }
+    .controls { margin-top: 20px; text-align: left; }
+    .controls label { font-weight: bold; }
+    .button { margin-top: 10px; width: 100%; padding: 10px; background-color: #007bff; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    .button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>AI Photo Enhancer</h2>
+  <input type="file" id="upload" accept="image/*"><br>
+  <div id="loader">Detecting face...</div>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <div class="controls">
+    <label for="blurRange">Skin Smoothness</label>
+    <input type="range" id="blurRange" min="0" max="10" value="5">
+    <button id="downloadBtn" class="button">Download Enhanced Photo</button>
+  </div>
+
+  <div class="controls">
+    <label>Beautify Filters</label>
+    <button onclick="applyBeautifyFilter('natural')" class="button">Natural</button>
+    <button onclick="applyBeautifyFilter('glow')" class="button">Glow</button>
+    <button onclick="applyBeautifyFilter('studio')" class="button">Studio</button>
+  </div>
+</div>
+<script src="script.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('Service Worker Registered'));
+  }
+</script>
+</body>
+</html>
